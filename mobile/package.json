@@ -1,0 +1,19 @@
+{
+  "name": "evidencelocker-mobile",
+  "version": "1.0.0",
+  "description": "Mobile wrapper for Evidence Locker using Capacitor and Frontend",
+  "private": true,
+  "scripts": {
+    "build:frontend": "npm run build --prefix frontend",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "build:android": "npm run build:frontend && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/cli": "^6.2.0"
+  }
+}

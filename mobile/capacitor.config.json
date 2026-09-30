@@ -1,0 +1,9 @@
+{
+  "appId": "com.evidencelocker.mobile",
+  "appName": "Evidence Locker",
+  "webDir": "frontend/dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  }
+}

@@ -1,0 +1,29 @@
+# Dependencies
+**/node_modules/
+
+# Build and generated output
+**/dist/
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/local.properties
+mobile/android/app/src/main/assets/
+mobile/android/app/src/main/res/xml/config.xml
+mobile/android/capacitor-cordova-android-plugins/
+
+# Uploaded files (keep the directory in the repository)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.idea/
+*.iml
+.DS_Store
+
+# Logs and test coverage
+*.log
+coverage/
