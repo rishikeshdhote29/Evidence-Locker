@@ -139,7 +139,7 @@ function roleCanUpload(role) {
 }
 
 function roleCanUpdateStatus(role) {
-  return ['support', 'police', 'admin'].includes(role);
+  return ['police', 'admin'].includes(role);
 }
 
 function roleCanEditEvidenceMetadata(role) {
@@ -534,16 +534,33 @@ function AppContent() {
     await openComplaint(activeComplaintId);
   };
 
-  const downloadEvidence = async (item) => {
-    try {
-      const blob = await api.downloadEvidence(item._id, token);
-      downloadBlob(blob, item.originalFilename);
-      setMessage(`Downloaded ${item.originalFilename}.`);
-      await openComplaint(activeComplaintId);
-    } catch (error) {
-      setMessage(`Download failed: ${error.message}`);
-    }
-  };
+   const downloadEvidence = async (item) => {
+     try {
+       const blob = await api.downloadEvidence(item._id, token);
+       downloadBlob(blob, item.originalFilename);
+       setMessage(`Downloaded ${item.originalFilename}.`);
+       await openComplaint(activeComplaintId);
+     } catch (error) {
+       setMessage(`Download failed: ${error.message}`);
+     }
+   };
+
+   const createNewComplaint = () => {
+     setActiveComplaintId('');
+     setActiveComplaint(null);
+     setForm(emptyForm());
+     setFraudType('UPI Fraud');
+     setEvidences([]);
+     setSelectedFiles([]);
+     setEvidenceMeta(emptyMetadata());
+     setAutoExtractedFields([]);
+     setStatusUpdate('under-review');
+     setStatusRemarks('');
+     setStatusOfficerName('');
+     setStatusRecipientUnit('');
+     setEditingEvidenceId('');
+     setMessage('Ready to create a new complaint.');
+   };
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.15),_transparent_35%),linear-gradient(180deg,#020617_0%,#0f172a_100%)]">
@@ -579,18 +596,25 @@ function AppContent() {
         {token ? (
           <DashboardPage>
             <div className="space-y-6">
-              <div className="glass-card p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="text-xl font-semibold text-white">{t.createCase}</h2>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
-                      {user?.role}
-                    </span>
-                    <button type="button" className="secondary-button px-3 py-2 text-sm" onClick={logout}>
-                      Logout
-                    </button>
-                  </div>
-                </div>
+               <div className="glass-card p-6">
+                 <div className="flex flex-wrap items-center justify-between gap-3">
+                   <h2 className="text-xl font-semibold text-white">{t.createCase}</h2>
+                   <div className="flex items-center gap-2">
+                     <button
+                       type="button"
+                       className="primary-button px-3 py-2 text-sm"
+                       onClick={createNewComplaint}
+                     >
+                       New Complaint
+                     </button>
+                     <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
+                       {user?.role}
+                     </span>
+                     <button type="button" className="secondary-button px-3 py-2 text-sm" onClick={logout}>
+                       Logout
+                     </button>
+                   </div>
+                 </div>
 
                 <form className="mt-4 space-y-4" onSubmit={submitComplaint}>
                   <div className="grid gap-4 md:grid-cols-2">

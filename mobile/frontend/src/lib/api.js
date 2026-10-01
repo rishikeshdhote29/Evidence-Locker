@@ -22,7 +22,7 @@ async function parseResponse(response) {
   }
 
   const contentType = response.headers.get('content-type') || '';
-  if (contentType.includes('application/pdf') || contentType.includes('application/octet-stream')) {
+  if (!contentType.includes('application/json')) {
     return response.blob();
   }
 
@@ -54,11 +54,11 @@ async function downloadRequest(path, options = {}) {
 }
 
 export const api = {
-  chat: (messages, token) =>
+  chat: (messages, token, incidentId = '') =>
     request('/api/chat', {
       method: 'POST',
       token,
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, incidentId }),
     }),
   requestOtp: (payload) =>
     request('/api/auth/request-otp', {
@@ -102,6 +102,12 @@ export const api = {
       token,
       body: formData,
     }),
+  uploadUnifiedEvidence: (formData, token) =>
+    request('/api/evidence/upload', {
+      method: 'POST',
+      token,
+      body: formData,
+    }),
   extractEvidenceMetadata: (complaintId, formData, token) =>
     request(`/api/evidence/${complaintId}/extract-metadata`, {
       method: 'POST',
@@ -115,6 +121,13 @@ export const api = {
       body: JSON.stringify(payload),
     }),
   downloadEvidence: (evidenceId, token) => downloadRequest(`/api/evidence/${evidenceId}/download`, { token }),
+  listEvidence: (token) => request('/api/evidence', { token }),
+  getEvidence: (evidenceId, token) => request(`/api/evidence/${evidenceId}`, { token }),
+  deleteEvidence: (evidenceId, token) =>
+    request(`/api/evidence/${evidenceId}`, {
+      method: 'DELETE',
+      token,
+    }),
   downloadPackage: (complaintId, token) => downloadRequest(`/api/complaints/${complaintId}/package`, { token }),
   getJurisdiction: (state, fraudType) =>
     request(`/api/jurisdiction?state=${encodeURIComponent(state)}&fraudType=${encodeURIComponent(fraudType)}`),

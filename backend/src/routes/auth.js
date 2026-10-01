@@ -14,14 +14,14 @@ const router = express.Router();
 
 const otpRequestLimiter = createRateLimiter({
   keyFn: (req) => `otp-request:${normalizeIdentifier(req.body.identifier)}:${String(req.body.role || '').trim().toLowerCase()}`,
-  max: 5,
+  max: 50,
   windowMs: 15 * 60 * 1000,
   message: 'Too many OTP requests. Please wait before trying again.',
 });
 
 const otpVerifyLimiter = createRateLimiter({
   keyFn: (req) => `otp-verify:${String(req.body.challengeId || '').trim()}`,
-  max: 10,
+  max: 100,
   windowMs: 15 * 60 * 1000,
   message: 'Too many OTP verification attempts. Please request a new OTP.',
 });
@@ -49,7 +49,7 @@ router.post('/request-otp', otpRequestLimiter, async (req, res, next) => {
     if (mode === 'register' && !displayName) {
       return res.status(400).json({ message: 'Display name is required' });
     }
-
+    
     let user = await User.findOne({ role, identifier });
     if (mode === 'login') {
       if (!user) {
@@ -75,7 +75,7 @@ router.post('/request-otp', otpRequestLimiter, async (req, res, next) => {
     if (identifierIsEmail) {
       if (isSmtpConfigured()) {
         try {
-          await sendOtpEmail({ to: identifier, otp, displayName });
+          // await sendOtpEmail({ to: identifier, otp, displayName });
           deliveryMethod = 'email';
         } catch (error) {
           console.error('Failed to send OTP email:', error);

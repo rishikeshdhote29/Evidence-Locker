@@ -1,4 +1,16 @@
 export const METADATA_FIELDS = [
+  'fileName',
+  'fileSize',
+  'mimeType',
+  'captureTimestamp',
+  'timezone',
+  'sha256Hash',
+  'deviceModel',
+  'androidVersion',
+  'screenResolution',
+  'applicationInfo',
+  'incidentId',
+  'uploadStatus',
   'fileType',
   'source',
   'sourceDevice',
@@ -9,6 +21,15 @@ export const METADATA_FIELDS = [
   'captureMethod',
   'captureLimitations',
 ];
+
+export async function calculateSha256(file) {
+  if (!window.crypto?.subtle) {
+    return '';
+  }
+
+  const digest = await window.crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
 
 const DEFAULT_LIMITATIONS =
   'Hash after upload confirms integrity post-capture. It cannot prove that evidence was unaltered before upload.';
@@ -72,11 +93,21 @@ function inferPlatformFromFilename(filename, complaint) {
 
 export function extractClientMetadata(file, complaint) {
   return {
+    fileName: file.name,
+    fileSize: file.size,
+    mimeType: file.type,
+    captureTimestamp: formatTimestamp(file.lastModified || Date.now()),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+    deviceModel: navigator.platform || '',
+    androidVersion: /Android\s([\d.]+)/i.exec(navigator.userAgent)?.[1] || '',
+    screenResolution: `${window.screen?.width || ''}x${window.screen?.height || ''}`,
+    applicationInfo: 'Evidence Locker mobile application',
+    uploadStatus: 'Ready to upload',
     fileType: fileTypeLabel(file),
     source: inferSourceFromFilename(file.name),
     sourceDevice: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
-      ? 'Mobile browser upload'
-      : 'Desktop browser upload',
+      ? 'Mobile device upload'
+      : 'Desktop upload',
     collectedAt: formatTimestamp(file.lastModified || Date.now()),
     transactionId: String(complaint?.formData?.transactionId || '').trim(),
     platformName: inferPlatformFromFilename(file.name, complaint),

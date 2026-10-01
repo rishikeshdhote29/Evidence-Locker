@@ -7,7 +7,7 @@ const QUICK_PROMPTS = [
   'Create a report',
 ];
 
-export default function Chatbot({ token }) {
+export default function Chatbot({ token, incidentId = '' }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -36,7 +36,8 @@ export default function Chatbot({ token }) {
     try {
       const result = await api.chat(
         history.filter((message) => message.role !== 'bot' || message.id !== 1).map(({ role, text }) => ({ role: role === 'bot' ? 'model' : role, text })),
-        token
+        token,
+        incidentId
       );
       setMessages((current) => [...current, { id: `${Date.now()}-bot`, role: 'bot', text: result.reply }]);
     } catch (requestError) {
